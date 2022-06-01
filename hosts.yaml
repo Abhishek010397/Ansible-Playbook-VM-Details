@@ -1,0 +1,39 @@
+---
+- hosts: localhost
+  become: true
+  # become_method: sudo
+  gather_facts: true
+  tasks: 
+  - name: Get Kernel Version
+    shell: |
+     #!/bin/bash
+     uname -r
+    register: kernel_version
+
+  - name: Print Kernel Version
+    debug:
+      msg: "Kernel Version: {{ kernel_version.stdout }}"
+
+  - name: Get OS Release
+    shell: |
+     #!/bin/bash
+     cat /etc/lsb-release
+    register: release_version
+
+  - name: Print Release Version
+    debug:
+      msg: "Release Version: {{ release_version.stdout }}"
+
+  - name: Gather the package facts
+    package_facts:
+      manager: auto
+
+  - name: Print the package facts
+    debug:
+      var: ansible_facts.packages
+
+
+  - name: Check whether a package called foobar is installed
+    debug:
+      msg: "{{ ansible_facts.packages['foobar'] }}"
+    when: "'foobar' in ansible_facts.packages"
